@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="bootstrap\css\bootstrap.css">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap-grid.min.css">
+    <style>
+        .menu{
+  position:relative;
+  width:90%;
+  z-index:9999;
+  }
+
+  #navv{
+    right: 0px;
+  }
+  .my-navbar{
+  width:100%;
+  padding:20px 20px;
+  background-color: #FB8A02;
+  position:absolute;
+  top:20px;
+  left:0;
+  z-index:999;
+  box-shadow:0px 2px 10px rgba(0,0,0,0.2);
+  }
+  
+  .nav-item .nav-link{
+  font-family:'Oswald', sans-serif;
+  font-size:15px;
+  font-weight:300;
+  text-transform:uppercase;
+  margin:0px 10px;
+  position:relative;
+  color:black;
+  }
+  
+  .nav-item .nav-link:before{
+  position:absolute;
+  left:0;
+  content:"";
+  bottom:0;
+  width:100%;
+  height:2px;
+  transform:scaleX(0);
+  transform-origin:left;
+  background-color:brown;
+  transition:0.5s;
+  }
+  
+  
+    .nav-item .nav-link:hover:before{
+	  transform:scaleX(1);
+  transform-origin:right;
+	}
+	.navbar-brand{
+	text-transform:capitalize;
+	color:#2f3542;
+	font-style:italic;
+	font-family:'Oswald', sans-serif;
+	font-weight:bold;
+    width: 190px;
+    height: 80px;
+	}
+	
+	.navbar-scroll{
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+	background-color:rgba(255,138,0,1);
+	padding:5px 20px;
+	transition:0.5s;
+	animation:scroll 0.6s 1;
+	}
+	
+	@keyframes scroll{
+	0%{transform:translateY(-100%);}
+	100%{transform:translateY(0%);}
+	}
+    </style>
+
+</head>
+<div class="container-fluid menu">
+    <nav class="navbar navbar-expand-lg my-navbar">
+  <img src="img/yan taxi.jpg" alt="Picture Not Found" class="navbar-brand">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav m-auto" id="navv">
+      <li class="nav-item active">
+        <a class="nav-link" href="home.html">Home <span class="sr-only"></span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="home.html">Vehicle</a>
+      </li>
+	    <li class="nav-item">
+        <a class="nav-link" href="order.html">Order now</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="orderhistory.html">Order History</a>
+      </li>
+	    <li class="nav-item">
+        <a class="nav-link" href="services.html">Services</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  </div>
+  <br><br><br>
+<body class="bg-dark">
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col">
+                <div class="card mt-5">
+                    <div class="card-header">
+                        <h2 class="display-6 text-center">Order History</h2>
+                    </div>
+                    <div class="card-body">
+                        <table id="order-table" class="table table-bordered text-center">
+                                 <tr class="bg-dark text-white">
+                                      <td>Invoice ID</td>
+                                     <td>Name</td>
+                                     <td>Email</td>
+                                     <td>Passenger</td>
+                                     <td>Pickup Address</td>
+                                     <td>Drop Address</td>
+                                     <td>Date</td>
+                                     <td>Time</td>
+                                     <td>Vehicle Type</td>
+                                     <td>cancle order</td>
+                                 </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+  // get data fro table
+  const table = document.getElementById('order-table');
+var id = sessionStorage.getItem('id');
+var username = sessionStorage.getItem('username');
+console.log("Logged in user ID: " + id);
+console.log("Logged in user username: " + username);
+
+
+fetch('http://localhost:8082/orders?userid=' + (id) + '&username=' + (username))
+  .then(response => response.json())
+  .then(data => {
+    data.forEach(order => {
+      const row = table.insertRow();
+      row.innerHTML = `
+        <td>${order.id}</td>
+        <td>${order.name}</td>
+        <td>${order.email}</td>
+        <td>${order.passenger}</td>
+        <td>${order.pickup}</td>
+        <td>${order.dropadd}</td>
+        <td>${order.dates}</td>
+        <td>${order.times}</td>
+        <td>${order.cartype}</td>
+        <td><button class="btn btn-danger btn-block" id="delete-btn" data-order-id="${order.id}">Delete</button></td>
+      `;
+    });
+    
+    const deleteBtns = document.querySelectorAll('#delete-btn');
+    deleteBtns.forEach(btn => {
+      btn.addEventListener('click', (event) => {
+        const orderId = event.target.getAttribute('data-order-id');
+        console.log('Deleting order with ID:', orderId);
+        
+        fetch(`http://localhost:8082/orders/${orderId}`, {
+          method: 'DELETE'
+        })
+        .then(response => {
+          if (response.ok) {
+             //remove data
+            const row = event.target.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+            console.log('Order deleted successfully');
+          } else {
+            console.error('Error deleting order:', response.statusText);
+          }
+        })
+        .catch(error => console.error(error));
+      });
+    });
+  })
+  .catch(error => console.error(error));
+</script>
+
+</body>
