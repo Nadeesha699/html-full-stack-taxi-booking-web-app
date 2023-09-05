@@ -1,2 +1,3 @@
 # Full-stack-Taxi-booking-web-application-using-springboots
- 
+
+Introducing our Full-stack Taxi Booking Web Application built with Spring Boot! This cutting-edge platform offers a seamless and efficient solution for both taxi service providers and passengers. Harnessing the power of Java and Spring Boot on the backend, and modern web technologies on the frontend, our application ensures secure and real-time ride booking, tracking, and management. With robust features such as user authentication, GPS integration, payment processing, and driver allocation, we provide a comprehensive taxi booking experience. Join us on this journey to revolutionize the transportation industry with a user-friendly, scalable, and reliable taxi booking system.
